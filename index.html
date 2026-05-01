@@ -1,0 +1,1222 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bienestar Estudiantil Inteligente</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Fraunces:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --pri:#1a6b5a;--pri2:#2d9b80;--pri3:#e0f5ef;
+  --acc:#f59e42;--acc2:#fff4e0;
+  --danger:#dc3545;--danger2:#fff0f0;
+  --warn:#f0a500;--warn2:#fff8e1;
+  --bg:#f4f7f5;--card:#fff;--text:#1a2e28;--muted:#5a7a71;
+  --border:#d4e8e2;--radius:14px;--shadow:0 2px 16px rgba(26,107,90,0.08);
+}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:15px;line-height:1.6}
+h1,h2,h3{font-family:'Fraunces',serif;font-weight:400}
+.app{display:flex;min-height:100vh}
+.sidebar{width:240px;background:var(--pri);color:#fff;display:flex;flex-direction:column;position:fixed;top:0;left:0;height:100vh;z-index:100}
+.sidebar-logo{padding:28px 24px 20px;border-bottom:1px solid rgba(255,255,255,.12)}
+.sidebar-logo h2{font-size:17px;font-weight:500;color:#fff;line-height:1.3}
+.sidebar-logo span{font-size:12px;opacity:.65}
+.nav-item{display:flex;align-items:center;gap:10px;padding:11px 22px;cursor:pointer;transition:.2s;font-size:14px;border-left:3px solid transparent;color:rgba(255,255,255,.8)}
+.nav-item:hover,.nav-item.active{background:rgba(255,255,255,.1);color:#fff;border-left-color:#a8e6d8}
+.nav-item svg{width:17px;height:17px;opacity:.8;flex-shrink:0}
+.nav-section{padding:16px 22px 6px;font-size:11px;text-transform:uppercase;letter-spacing:1px;opacity:.4;margin-top:8px}
+.main{margin-left:240px;flex:1;min-height:100vh}
+.topbar{background:#fff;border-bottom:1px solid var(--border);padding:14px 32px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50}
+.topbar-title{font-family:'Fraunces',serif;font-size:20px;color:var(--pri)}
+.topbar-user{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--muted)}
+.avatar{width:34px;height:34px;border-radius:50%;background:var(--pri3);display:flex;align-items:center;justify-content:center;font-weight:600;font-size:13px;color:var(--pri)}
+.content{padding:32px;max-width:1100px}
+.screen{display:none}
+.screen.active{display:block}
+
+/* AUTH */
+.auth-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#0d4a3c 0%,#1a6b5a 50%,#2d9b80 100%);padding:20px}
+.auth-card{background:#fff;border-radius:20px;padding:44px;width:100%;max-width:460px;box-shadow:0 24px 60px rgba(0,0,0,.18)}
+.auth-logo{text-align:center;margin-bottom:28px}
+.auth-logo h1{font-size:24px;color:var(--pri);margin-bottom:4px}
+.auth-logo p{font-size:13px;color:var(--muted)}
+.auth-icon{width:56px;height:56px;background:var(--pri3);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:24px}
+.tabs{display:flex;border-bottom:2px solid var(--border);margin-bottom:28px}
+.tab{flex:1;padding:10px;text-align:center;cursor:pointer;font-size:14px;color:var(--muted);border-bottom:2px solid transparent;margin-bottom:-2px;transition:.2s}
+.tab.active{color:var(--pri);border-bottom-color:var(--pri);font-weight:500}
+.field{margin-bottom:16px}
+.field label{display:block;font-size:12px;font-weight:500;color:var(--muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px}
+.field input,.field select{width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:14px;font-family:'DM Sans',sans-serif;outline:none;transition:.2s;background:#fff;color:var(--text)}
+.field input:focus,.field select:focus{border-color:var(--pri);box-shadow:0 0 0 3px rgba(26,107,90,.1)}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.btn{width:100%;padding:13px;background:var(--pri);color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;transition:.2s}
+.btn:hover{background:var(--pri2);transform:translateY(-1px)}
+.btn:disabled{opacity:.6;cursor:not-allowed;transform:none}
+.btn-outline{background:transparent;border:1.5px solid var(--border);color:var(--muted)}
+.btn-outline:hover{background:var(--bg);border-color:var(--pri);color:var(--pri)}
+.btn-danger{background:var(--danger)}
+.btn-danger:hover{background:#b02a37}
+.card{background:var(--card);border-radius:var(--radius);border:1px solid var(--border);padding:24px;box-shadow:var(--shadow)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.badge{display:inline-flex;align-items:center;gap:5px;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:500}
+.badge-low{background:#e0f5ef;color:#1a6b5a}
+.badge-med{background:#fff8e1;color:#b07800}
+.badge-high{background:#fff0f0;color:#dc3545}
+.dot{width:8px;height:8px;border-radius:50%;display:inline-block}
+.dot-low{background:#2d9b80}.dot-med{background:#f0a500}.dot-high{background:#dc3545}
+.risk-meter{position:relative;height:12px;background:#eee;border-radius:6px;overflow:hidden;margin:10px 0}
+.risk-fill{height:100%;border-radius:6px;transition:width .6s ease}
+.risk-low{background:linear-gradient(90deg,#2d9b80,#5ec4a5)}
+.risk-med{background:linear-gradient(90deg,#f0a500,#ffc73d)}
+.risk-high{background:linear-gradient(90deg,#dc3545,#ff6b7a)}
+.q-card{background:#fff;border:1.5px solid var(--border);border-radius:12px;padding:20px;margin-bottom:14px;transition:.2s}
+.q-card:hover{border-color:var(--pri2);box-shadow:var(--shadow)}
+.q-label{font-size:14px;font-weight:500;margin-bottom:12px;color:var(--text);display:flex;align-items:center;gap:8px}
+.q-num{width:24px;height:24px;background:var(--pri3);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:var(--pri);flex-shrink:0}
+.options{display:flex;flex-direction:column;gap:7px}
+.opt{display:flex;align-items:center;gap:10px;padding:9px 14px;border:1.5px solid var(--border);border-radius:8px;cursor:pointer;font-size:13px;transition:.2s}
+.opt:hover{border-color:var(--pri2);background:var(--pri3)}
+.opt.selected{border-color:var(--pri);background:var(--pri3);font-weight:500}
+.opt input{accent-color:var(--pri)}
+.result-hero{text-align:center;padding:32px 20px;border-radius:16px;margin-bottom:24px}
+.result-low{background:linear-gradient(135deg,#e0f5ef,#b8ebd8)}
+.result-med{background:linear-gradient(135deg,#fff8e1,#ffe0a0)}
+.result-high{background:linear-gradient(135deg,#fff0f0,#ffc8c8)}
+.result-score{font-size:56px;font-family:'Fraunces',serif;margin:12px 0 4px}
+.result-level{font-size:22px;font-weight:500;margin-bottom:8px}
+.rec-item{display:flex;align-items:flex-start;gap:12px;padding:14px;background:var(--bg);border-radius:10px;margin-bottom:10px}
+.rec-icon{width:36px;height:36px;border-radius:10px;background:var(--pri3);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.stat-card{background:var(--card);border-radius:12px;border:1px solid var(--border);padding:18px 20px;box-shadow:var(--shadow)}
+.stat-val{font-size:28px;font-family:'Fraunces',serif;color:var(--pri);margin-bottom:2px}
+.stat-lbl{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+.hist-table{width:100%;border-collapse:collapse;font-size:13px}
+.hist-table th{padding:10px 14px;text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);border-bottom:1.5px solid var(--border);font-weight:500}
+.hist-table td{padding:12px 14px;border-bottom:1px solid var(--border)}
+.hist-table tr:last-child td{border:none}
+.hist-table tr:hover td{background:var(--bg)}
+.admin-header{background:linear-gradient(135deg,var(--pri) 0%,var(--pri2) 100%);color:#fff;padding:32px;border-radius:var(--radius);margin-bottom:24px}
+.progress-bar{height:6px;background:#eee;border-radius:3px;overflow:hidden}
+.progress-fill{height:100%;border-radius:3px;transition:width .5s}
+.chat-wrap{position:fixed;bottom:24px;right:24px;z-index:200;display:flex;flex-direction:column;align-items:flex-end}
+.chat-btn{width:52px;height:52px;background:var(--pri);border:none;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(26,107,90,.35);transition:.2s}
+.chat-btn:hover{transform:scale(1.08)}
+.chat-box{width:320px;background:#fff;border-radius:16px;box-shadow:0 8px 40px rgba(0,0,0,.15);overflow:hidden;display:none;flex-direction:column;margin-bottom:10px}
+.chat-box.open{display:flex}
+.chat-header{background:var(--pri);color:#fff;padding:14px 18px;font-size:14px;font-weight:500}
+.chat-msgs{height:220px;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:8px}
+.msg{max-width:80%;padding:9px 13px;border-radius:12px;font-size:13px;line-height:1.5}
+.msg-bot{background:var(--pri3);color:var(--text);align-self:flex-start;border-radius:4px 12px 12px 12px}
+.msg-user{background:var(--pri);color:#fff;align-self:flex-end;border-radius:12px 4px 12px 12px}
+.chat-input{display:flex;padding:10px 12px;border-top:1px solid var(--border);gap:8px}
+.chat-input input{flex:1;border:1.5px solid var(--border);border-radius:8px;padding:8px 12px;font-size:13px;font-family:'DM Sans',sans-serif;outline:none}
+.chat-input input:focus{border-color:var(--pri)}
+.chat-send{background:var(--pri);color:#fff;border:none;border-radius:8px;padding:8px 12px;cursor:pointer;font-size:13px}
+.notif{position:fixed;top:20px;right:20px;z-index:300;background:#fff;border-left:4px solid var(--pri);border-radius:10px;padding:14px 18px;box-shadow:0 4px 20px rgba(0,0,0,.12);font-size:13px;max-width:300px;transform:translateX(350px);transition:.4s}
+.notif.show{transform:translateX(0)}
+.section-title{font-size:18px;font-family:'Fraunces',serif;margin-bottom:16px;color:var(--pri)}
+.sub-title{font-size:13px;color:var(--muted);margin-bottom:20px}
+.mt8{margin-top:8px}.mt16{margin-top:16px}.mt24{margin-top:24px}.mt32{margin-top:32px}
+.mb8{margin-bottom:8px}.mb16{margin-bottom:16px}.mb24{margin-bottom:24px}
+.flex{display:flex}.items-center{align-items:center}.justify-between{justify-content:space-between}.gap8{gap:8px}.gap12{gap:12px}.gap16{gap:16px}
+.text-muted{color:var(--muted);font-size:13px}.text-sm{font-size:13px}.fw500{font-weight:500}.w100{width:100%}
+.alert-box{border-radius:12px;padding:16px;font-size:14px;margin-bottom:16px}
+.alert-high{background:#fff0f0;border:1.5px solid #ffc8c8;color:#8b1c2c}
+.emergency-btn{background:var(--danger);color:#fff;border:none;padding:13px 20px;border-radius:10px;cursor:pointer;font-size:14px;font-weight:500;font-family:'DM Sans',sans-serif;width:100%;margin-top:10px;transition:.2s}
+.emergency-btn:hover{background:#b02a37}
+.contact-card{display:flex;align-items:center;gap:12px;padding:13px 16px;background:#fff;border:1px solid var(--border);border-radius:10px;margin-bottom:8px}
+.contact-icon{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.loading-overlay{position:fixed;inset:0;background:rgba(255,255,255,.85);display:flex;align-items:center;justify-content:center;z-index:500;flex-direction:column;gap:12px}
+.spinner{width:40px;height:40px;border:3px solid var(--border);border-top-color:var(--pri);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.empty-state{text-align:center;padding:40px 20px;color:var(--muted)}
+.empty-state div{font-size:40px;margin-bottom:12px}
+@media(max-width:768px){
+  .sidebar{transform:translateX(-100%);width:220px}.main{margin-left:0}.content{padding:16px}
+  .grid2,.grid3,.grid4{grid-template-columns:1fr}.row2{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- LOADING -->
+<div id="loading-overlay" class="loading-overlay">
+  <div class="spinner"></div>
+  <div style="font-size:13px;color:var(--muted)">Conectando con Supabase...</div>
+</div>
+
+<div id="notif" class="notif"></div>
+
+<!-- AUTH -->
+<div id="screen-auth" class="screen">
+  <div class="auth-wrap">
+    <div class="auth-card">
+      <div class="auth-logo">
+        <div class="auth-icon">🌱</div>
+        <h1>Bienestar Estudiantil</h1>
+        <p>Plataforma inteligente de salud emocional universitaria</p>
+      </div>
+      <div class="tabs">
+        <div class="tab active" onclick="switchTab('login')">Iniciar sesión</div>
+        <div class="tab" onclick="switchTab('register')">Registrarse</div>
+      </div>
+
+      <!-- LOGIN -->
+      <div id="tab-login">
+        <div class="field"><label>Correo electrónico</label><input type="email" id="login-email" placeholder="correo@universidad.edu"></div>
+        <div class="field"><label>Contraseña</label><input type="password" id="login-pass" placeholder="••••••••"></div>
+        <button class="btn" id="btn-login" onclick="doLogin()">Entrar a mi plataforma</button>
+        <div style="margin:16px 0;text-align:center;font-size:12px;color:var(--muted)">— o ingresa como —</div>
+        <button class="btn btn-outline" onclick="doAdminLogin()" style="font-size:13px">Panel Administrativo Universidad</button>
+        <div id="auth-error" style="color:var(--danger);font-size:13px;margin-top:12px;text-align:center;display:none"></div>
+      </div>
+
+      <!-- REGISTER -->
+      <div id="tab-register" style="display:none">
+        <div class="field"><label>Nombre completo</label><input type="text" id="reg-name" placeholder="María García López"></div>
+        <div class="row2">
+          <div class="field"><label>Correo</label><input type="email" id="reg-email" placeholder="correo@uni.edu"></div>
+          <div class="field"><label>Contraseña</label><input type="password" id="reg-pass" placeholder="••••••••"></div>
+        </div>
+        <div class="row2">
+          <div class="field"><label>Universidad</label><input type="text" id="reg-uni" placeholder="Universidad del Norte"></div>
+          <div class="field"><label>Carrera</label><input type="text" id="reg-car" placeholder="Ingeniería de Sistemas"></div>
+        </div>
+        <div class="row2">
+          <div class="field"><label>Semestre</label>
+            <select id="reg-sem">
+              <option>1°</option><option>2°</option><option>3°</option><option selected>4°</option>
+              <option>5°</option><option>6°</option><option>7°</option><option>8°</option><option>9°</option><option>10°</option>
+            </select>
+          </div>
+          <div class="field"><label>Edad (opc.)</label><input type="number" id="reg-age" placeholder="20"></div>
+        </div>
+        <div class="row2">
+          <div class="field"><label>Teléfono (opc.)</label><input type="tel" id="reg-tel" placeholder="+57 300..."></div>
+          <div class="field"><label>Ciudad (opc.)</label><input type="text" id="reg-city" placeholder="Barranquilla"></div>
+        </div>
+        <button class="btn" id="btn-register" onclick="doRegister()">Crear mi cuenta</button>
+        <div id="reg-error" style="color:var(--danger);font-size:13px;margin-top:12px;text-align:center;display:none"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="screen-app" class="screen">
+  <div class="app">
+    <nav class="sidebar" id="sidebar">
+      <div class="sidebar-logo">
+        <h2>🌱 Bienestar Estudiantil</h2>
+        <span>Inteligente</span>
+      </div>
+      <div style="padding:20px 0;flex:1">
+        <div class="nav-section">Estudiante</div>
+        <div class="nav-item active" onclick="goTo('dashboard')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>Dashboard
+        </div>
+        <div class="nav-item" onclick="goTo('eval')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>Evaluar bienestar
+        </div>
+        <div class="nav-item" onclick="goTo('historia')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>Mi historial
+        </div>
+        <div class="nav-item" onclick="goTo('recs')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>Recomendaciones
+        </div>
+        <div class="nav-item" onclick="goTo('apoyo')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>Red de apoyo
+        </div>
+        <div class="nav-section" id="nav-admin-section" style="display:none">Sistema</div>
+        <div class="nav-item" id="nav-admin" onclick="goTo('admin')" style="display:none">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Panel universidad
+        </div>
+        <div class="nav-item" onclick="doLogout()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>Cerrar sesión
+        </div>
+      </div>
+    </nav>
+
+    <div class="main">
+      <div class="topbar">
+        <div class="topbar-title" id="page-title">Dashboard</div>
+        <div class="topbar-user">
+          <span class="text-muted" id="top-date"></span>
+          <div class="avatar" id="user-avatar">MG</div>
+          <span id="user-name-top">Cargando...</span>
+        </div>
+      </div>
+
+      <div class="content">
+
+        <!-- DASHBOARD -->
+        <div id="page-dashboard" class="page-section">
+          <div class="grid4 mb16">
+            <div class="stat-card"><div class="stat-val" id="dash-score">—</div><div class="stat-lbl">Último puntaje</div></div>
+            <div class="stat-card"><div class="stat-val" id="dash-nivel" style="font-size:18px">—</div><div class="stat-lbl">Nivel de riesgo</div></div>
+            <div class="stat-card"><div class="stat-val" id="dash-count" style="font-size:22px">0</div><div class="stat-lbl">Evaluaciones realizadas</div></div>
+            <div class="stat-card"><div class="stat-val" id="dash-dias" style="font-size:18px">—</div><div class="stat-lbl">Última evaluación</div></div>
+          </div>
+          <div class="grid2">
+            <div class="card">
+              <div class="flex items-center justify-between mb16">
+                <h3 style="font-size:16px">Estado actual de bienestar</h3>
+                <span class="badge" id="dash-badge">Sin datos</span>
+              </div>
+              <div class="risk-meter"><div class="risk-fill" id="dash-meter" style="width:0%"></div></div>
+              <div class="flex justify-between text-sm text-muted mt8"><span>Bajo</span><span>Medio</span><span>Alto</span></div>
+              <div style="margin:20px 0 0">
+                <div id="dash-msg" style="font-size:13px;color:var(--muted);margin-bottom:10px">Realiza tu primera evaluación para ver tu estado de bienestar.</div>
+                <button class="btn" onclick="goTo('eval')">📋 Evaluar mi bienestar ahora</button>
+              </div>
+            </div>
+            <div class="card">
+              <h3 style="font-size:16px;margin-bottom:16px">Resumen personal</h3>
+              <div style="display:flex;flex-direction:column;gap:10px">
+                <div class="flex justify-between"><span class="text-muted text-sm">Universidad</span><span class="text-sm fw500" id="d-uni">—</span></div>
+                <div class="flex justify-between"><span class="text-muted text-sm">Carrera</span><span class="text-sm fw500" id="d-car">—</span></div>
+                <div class="flex justify-between"><span class="text-muted text-sm">Semestre</span><span class="text-sm fw500" id="d-sem">—</span></div>
+                <div class="flex justify-between"><span class="text-muted text-sm">Correo</span><span class="text-sm fw500" id="d-email">—</span></div>
+                <div class="flex justify-between"><span class="text-muted text-sm">Miembro desde</span><span class="text-sm fw500" id="d-since">—</span></div>
+              </div>
+            </div>
+          </div>
+          <div class="mt24">
+            <h3 class="section-title">Evolución emocional</h3>
+            <div class="card"><div style="position:relative;height:220px"><canvas id="dashChart"></canvas></div></div>
+          </div>
+          <div class="mt24 grid2">
+            <div class="card">
+              <h3 style="font-size:16px;margin-bottom:14px">Recomendaciones activas</h3>
+              <div id="dash-recs">
+                <div class="empty-state"><div>💡</div><p>Completa una evaluación para ver recomendaciones</p></div>
+              </div>
+            </div>
+            <div class="card">
+              <h3 style="font-size:16px;margin-bottom:14px">Acceso rápido</h3>
+              <div style="display:flex;flex-direction:column;gap:8px">
+                <button class="btn" onclick="goTo('eval')" style="font-size:13px">🧠 Nueva evaluación</button>
+                <button class="btn btn-outline" onclick="goTo('apoyo')" style="font-size:13px">🤝 Ver red de apoyo</button>
+                <button class="btn btn-outline" onclick="goTo('historia')" style="font-size:13px">📈 Ver mi historial</button>
+                <button class="emergency-btn" onclick="triggerEmergency()" style="font-size:13px">🚨 Necesito ayuda urgente</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- EVALUACIÓN -->
+        <div id="page-eval" class="page-section" style="display:none">
+          <div id="eval-form">
+            <h2 class="section-title">Autovaloración de Bienestar</h2>
+            <p class="sub-title">Responde honestamente. Esta información es confidencial y nos ayuda a brindarte el apoyo adecuado.</p>
+            <div id="questions-wrap"></div>
+            <div style="margin-top:24px">
+              <div class="flex items-center justify-between text-sm text-muted mb16">
+                <span>Progreso: <span id="prog-count">0</span> de 8 respondidas</span>
+                <span id="prog-pct">0%</span>
+              </div>
+              <div class="progress-bar mb16"><div class="progress-fill" id="eval-prog" style="width:0%;background:var(--pri)"></div></div>
+              <button class="btn" id="btn-submit-eval" onclick="submitEval()">Analizar mi bienestar →</button>
+            </div>
+          </div>
+          <div id="eval-result" style="display:none">
+            <div id="result-hero" class="result-hero">
+              <div style="font-size:40px" id="result-emoji">😐</div>
+              <div class="result-score" id="result-score">—</div>
+              <div class="result-level" id="result-level">—</div>
+              <p id="result-desc" style="font-size:14px;opacity:.8"></p>
+            </div>
+            <div id="result-recs"></div>
+            <div id="result-contacts" style="display:none"></div>
+            <div class="mt24 flex gap8">
+              <button class="btn btn-outline" onclick="resetEval()" style="flex:1">← Nueva evaluación</button>
+              <button class="btn" onclick="goTo('historia')" style="flex:1">Ver mi historial →</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- HISTORIAL -->
+        <div id="page-historia" class="page-section" style="display:none">
+          <h2 class="section-title">Mi Historial Emocional</h2>
+          <div class="grid2 mb24">
+            <div class="card"><div style="position:relative;height:180px"><canvas id="histChart"></canvas></div></div>
+            <div class="card"><div style="position:relative;height:180px"><canvas id="areaChart"></canvas></div></div>
+          </div>
+          <div class="card">
+            <h3 style="font-size:15px;margin-bottom:16px">Evaluaciones realizadas</h3>
+            <div id="hist-empty" class="empty-state" style="display:none"><div>📋</div><p>Aún no tienes evaluaciones. ¡Realiza tu primera!</p></div>
+            <table class="hist-table" id="hist-table">
+              <thead><tr><th>Fecha</th><th>Puntaje</th><th>Nivel</th><th>Estrés</th><th>Sueño</th><th>Ansiedad</th></tr></thead>
+              <tbody id="hist-body"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- RECOMENDACIONES -->
+        <div id="page-recs" class="page-section" style="display:none">
+          <h2 class="section-title">Recomendaciones Personalizadas</h2>
+          <p class="sub-title" id="recs-subtitle">Basadas en tu última evaluación</p>
+          <div class="grid2">
+            <div>
+              <div class="card mb16">
+                <div class="flex items-center gap12 mb16"><div style="width:40px;height:40px;background:#e0f5ef;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px">🧘</div><div><div class="fw500">Técnicas de relajación</div><div class="text-muted text-sm">Manejo del estrés</div></div></div>
+                <div class="rec-item"><div class="rec-icon" style="font-size:14px">🌬️</div><div><div class="fw500 text-sm">Respiración 4-7-8</div><div class="text-muted" style="font-size:12px">Inhala 4s, retén 7s, exhala 8s. Repite 4 veces.</div></div></div>
+                <div class="rec-item"><div class="rec-icon" style="font-size:14px">🧠</div><div><div class="fw500 text-sm">Meditación guiada 5 min</div><div class="text-muted" style="font-size:12px">Cierra los ojos, enfócate en tu respiración.</div></div></div>
+                <div class="rec-item"><div class="rec-icon" style="font-size:14px">✍️</div><div><div class="fw500 text-sm">Journaling emocional</div><div class="text-muted" style="font-size:12px">Escribe 3 cosas positivas antes de dormir.</div></div></div>
+              </div>
+              <div class="card">
+                <div class="flex items-center gap12 mb16"><div style="width:40px;height:40px;background:#fff8e1;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px">⏰</div><div><div class="fw500">Organización del tiempo</div><div class="text-muted text-sm">Productividad sana</div></div></div>
+                <div class="rec-item"><div class="rec-icon" style="font-size:14px">📅</div><div><div class="fw500 text-sm">Técnica Pomodoro</div><div class="text-muted" style="font-size:12px">25 min trabajo + 5 min descanso.</div></div></div>
+                <div class="rec-item"><div class="rec-icon" style="font-size:14px">🌙</div><div><div class="fw500 text-sm">Rutina de sueño constante</div><div class="text-muted" style="font-size:12px">Acuéstate y levántate a la misma hora.</div></div></div>
+              </div>
+            </div>
+            <div>
+              <div class="card mb16">
+                <div class="flex items-center gap12 mb16"><div style="width:40px;height:40px;background:#fff0f0;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px">🤝</div><div><div class="fw500">Apoyo profesional</div><div class="text-muted text-sm">Recomendado para tu nivel</div></div></div>
+                <div id="recs-alert" class="alert-box" style="background:#fff8e1;border:1.5px solid #ffe0a0;color:#7a5800;font-size:13px">Completa una evaluación para ver recomendaciones personalizadas.</div>
+                <div class="contact-card"><div class="contact-icon" style="background:#e0f5ef">🧑‍⚕️</div><div><div class="fw500 text-sm">Psicología Universitaria</div><div class="text-muted" style="font-size:12px">Ext. 2345 · Lun-Vie 8am-5pm</div></div></div>
+                <div class="contact-card"><div class="contact-icon" style="background:#e8f4ff">📚</div><div><div class="fw500 text-sm">Orientación Académica</div><div class="text-muted" style="font-size:12px">Ext. 1234 · Lun-Vie 7am-6pm</div></div></div>
+              </div>
+              <div class="card" style="background:linear-gradient(135deg,#e0f5ef,#b8ebd8);border-color:#a8dbc8">
+                <div style="font-size:24px;margin-bottom:8px">💪</div>
+                <div class="fw500 mb8">¡Vas bien!</div>
+                <div class="text-sm" style="color:#1a4a3a">Recuerda que buscar ayuda es un signo de fortaleza, no debilidad. Estás tomando pasos importantes para tu bienestar.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- APOYO -->
+        <div id="page-apoyo" class="page-section" style="display:none">
+          <h2 class="section-title">Red de Apoyo</h2>
+          <p class="sub-title">Contactos disponibles para acompañarte en tu proceso</p>
+          <div class="grid2">
+            <div>
+              <div class="card mb16">
+                <h3 style="font-size:15px;margin-bottom:14px">Apoyo universitario</h3>
+                <div class="contact-card"><div class="contact-icon" style="background:#e0f5ef;font-size:18px">🧑‍⚕️</div><div style="flex:1"><div class="fw500 text-sm">Departamento de Psicología</div><div class="text-muted" style="font-size:12px">Ext. 2345 · Edificio Bienestar Of. 201</div></div></div>
+                <div class="contact-card"><div class="contact-icon" style="background:#e8f4ff;font-size:18px">🏫</div><div style="flex:1"><div class="fw500 text-sm">Bienestar Universitario</div><div class="text-muted" style="font-size:12px">Ext. 1000 · Lunes a Viernes</div></div></div>
+                <div class="contact-card"><div class="contact-icon" style="background:#fff8e1;font-size:18px">👨‍🎓</div><div style="flex:1"><div class="fw500 text-sm">Tutor Académico</div><div class="text-muted" style="font-size:12px">Prof. Rodríguez · Miér 2-4pm</div></div></div>
+              </div>
+              <div class="card">
+                <h3 style="font-size:15px;margin-bottom:14px">Líneas de crisis nacionales</h3>
+                <div class="contact-card"><div class="contact-icon" style="background:#fff0f0;font-size:18px">📞</div><div style="flex:1"><div class="fw500 text-sm">Línea 106 - Salud Mental</div><div class="text-muted" style="font-size:12px">Gratuita · 24/7 · Confidencial</div></div><button class="btn btn-danger" style="padding:6px 12px;font-size:12px;width:auto">106</button></div>
+                <div class="contact-card"><div class="contact-icon" style="background:#fff0f0;font-size:18px">🚑</div><div style="flex:1"><div class="fw500 text-sm">Emergencias</div><div class="text-muted" style="font-size:12px">Policía Nacional - Bomberos</div></div><button class="btn btn-danger" style="padding:6px 12px;font-size:12px;width:auto">123</button></div>
+              </div>
+            </div>
+            <div>
+              <div class="card mb16" style="background:linear-gradient(135deg,#fff0f0,#fce4e4);border-color:#f5c0c0">
+                <h3 style="font-size:15px;margin-bottom:12px;color:#8b1c2c">¿Estás en crisis ahora?</h3>
+                <p style="font-size:13px;color:#6b1020;margin-bottom:16px">Si sientes que puedes hacerte daño o estás en una situación de emergencia emocional, activa este botón para recibir atención inmediata.</p>
+                <button class="emergency-btn" onclick="triggerEmergency()">🚨 ACTIVAR ALERTA DE CRISIS</button>
+              </div>
+              <div class="card">
+                <h3 style="font-size:15px;margin-bottom:14px">Agenda con psicólogo</h3>
+                <div class="field"><label>Selecciona fecha</label><input type="date" id="cita-fecha"></div>
+                <div class="field"><label>Hora disponible</label><select id="cita-hora"><option>9:00 AM</option><option>10:30 AM</option><option>2:00 PM</option><option>3:30 PM</option></select></div>
+                <div class="field"><label>Motivo (opcional)</label><input type="text" id="cita-motivo" placeholder="Estrés académico, ansiedad..."></div>
+                <button class="btn" onclick="agendarCita()">Agendar cita</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ADMIN -->
+        <div id="page-admin" class="page-section" style="display:none">
+          <div class="admin-header">
+            <div class="flex items-center justify-between">
+              <div>
+                <h2 style="color:#fff;font-size:22px;margin-bottom:4px">Panel Administrativo</h2>
+                <p style="color:rgba(255,255,255,.7);font-size:13px">Vista general de todos los estudiantes registrados</p>
+              </div>
+            </div>
+          </div>
+          <div class="grid4 mb24">
+            <div class="stat-card"><div class="stat-val" id="adm-total">0</div><div class="stat-lbl">Estudiantes registrados</div></div>
+            <div class="stat-card"><div class="stat-val" id="adm-alto" style="color:var(--danger)">0</div><div class="stat-lbl">Riesgo alto</div></div>
+            <div class="stat-card"><div class="stat-val" id="adm-medio" style="color:var(--warn)">0</div><div class="stat-lbl">Riesgo medio</div></div>
+            <div class="stat-card"><div class="stat-val" id="adm-bajo" style="color:var(--pri)">0</div><div class="stat-lbl">Riesgo bajo</div></div>
+          </div>
+          <div class="grid2 mb24">
+            <div class="card"><h3 style="font-size:15px;margin-bottom:14px">Distribución de riesgo</h3><div style="position:relative;height:220px"><canvas id="adminChart"></canvas></div></div>
+            <div class="card"><h3 style="font-size:15px;margin-bottom:14px">Evaluaciones por mes</h3><div style="position:relative;height:220px"><canvas id="trendChart"></canvas></div></div>
+          </div>
+          <div class="card">
+            <div class="flex items-center justify-between mb16">
+              <h3 style="font-size:15px">Últimas evaluaciones — Todos los estudiantes</h3>
+              <span class="badge badge-high" id="adm-alert-count">0 alertas</span>
+            </div>
+            <table class="hist-table">
+              <thead><tr><th>Nombre</th><th>Universidad</th><th>Carrera</th><th>Puntaje</th><th>Nivel</th><th>Fecha</th></tr></thead>
+              <tbody id="adm-body"></tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CHATBOT -->
+<div class="chat-wrap" id="chatWrap" style="display:none">
+  <div class="chat-box" id="chatBox">
+    <div class="chat-header">🤖 Asistente de Bienestar IA</div>
+    <div class="chat-msgs" id="chatMsgs">
+      <div class="msg msg-bot">Hola 👋 Soy tu asistente de bienestar. ¿Cómo te sientes hoy?</div>
+    </div>
+    <div class="chat-input">
+      <input type="text" id="chatIn" placeholder="Escribe aquí..." onkeypress="if(event.key==='Enter')sendChat()">
+      <button class="chat-send" onclick="sendChat()">→</button>
+    </div>
+  </div>
+  <button class="chat-btn" onclick="toggleChat()">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+  </button>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+// =============================================
+// SUPABASE CONFIG
+// =============================================
+const SUPABASE_URL = 'https://ynqhrkagcorhkhdinxpn.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_u2OiQ3_Vi_Ux-5nJX-Y_rQ_5Q1N3Nki';
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+// =============================================
+// STATE
+// =============================================
+const state = {
+  user: null,
+  profile: null,
+  role: 'student',
+  answers: {},
+  historialData: [],
+  lastScore: null,
+  lastNivel: null,
+  dashChart: null,
+  histChart: null,
+  areaChart: null,
+  adminChart: null,
+  trendChart: null
+};
+
+const questions = [
+  {id:'stress',label:'¿Qué tan estresado/a te has sentido esta semana?',opts:[{t:'Casi nada',v:1},{t:'Algo estresado/a',v:2},{t:'Muy estresado/a',v:3}]},
+  {id:'academic',label:'¿Sientes que la carga académica te supera?',opts:[{t:'No, la manejo bien',v:1},{t:'A veces me cuesta',v:2},{t:'Sí, me abruma',v:3}]},
+  {id:'sleep',label:'¿Cuántas horas duermes por noche?',opts:[{t:'7 o más horas',v:1},{t:'5 a 6 horas',v:2},{t:'Menos de 5 horas',v:3}]},
+  {id:'emotional',label:'¿Cómo te has sentido emocionalmente?',opts:[{t:'Bien, estable',v:1},{t:'Con altibajos',v:2},{t:'Mal, muy inestable',v:3}]},
+  {id:'motivation',label:'¿Te sientes motivado/a con tus estudios?',opts:[{t:'Sí, me motivan',v:1},{t:'Más o menos',v:2},{t:'No, he perdido el interés',v:3}]},
+  {id:'anxiety',label:'¿Has sentido ansiedad recientemente?',opts:[{t:'No significativa',v:1},{t:'Algo de ansiedad',v:2},{t:'Ansiedad frecuente e intensa',v:3}]},
+  {id:'loneliness',label:'¿Te has sentido solo/a o aislado/a?',opts:[{t:'No, me siento acompañado/a',v:1},{t:'A veces me siento solo/a',v:2},{t:'Me siento muy solo/a',v:3}]},
+  {id:'negative',label:'¿Te cuesta manejar pensamientos negativos?',opts:[{t:'Los manejo bien',v:1},{t:'Algunos me afectan',v:2},{t:'Me cuesta mucho',v:3}]},
+];
+
+// =============================================
+// INIT — check session on load
+// =============================================
+window.addEventListener('load', async () => {
+  try {
+    const { data: { session } } = await sb.auth.getSession();
+    if (session) {
+      state.user = session.user;
+      await loadProfile();
+      showApp();
+    } else {
+      showAuth();
+    }
+  } catch(e) {
+    console.error(e);
+    showAuth();
+  }
+});
+
+function showAuth() {
+  document.getElementById('loading-overlay').style.display = 'none';
+  document.getElementById('screen-auth').classList.add('active');
+}
+
+// =============================================
+// AUTH FUNCTIONS
+// =============================================
+function switchTab(t) {
+  document.querySelectorAll('.tab').forEach((el,i) => el.classList.toggle('active', i===(t==='login'?0:1)));
+  document.getElementById('tab-login').style.display = t==='login' ? '' : 'none';
+  document.getElementById('tab-register').style.display = t==='register' ? '' : 'none';
+  document.getElementById('auth-error').style.display = 'none';
+  document.getElementById('reg-error').style.display = 'none';
+}
+
+async function doLogin() {
+  const email = document.getElementById('login-email').value.trim();
+  const pass = document.getElementById('login-pass').value;
+  if (!email || !pass) { showAuthError('Completa correo y contraseña'); return; }
+  const btn = document.getElementById('btn-login');
+  btn.disabled = true; btn.textContent = 'Ingresando...';
+  try {
+    const { data, error } = await sb.auth.signInWithPassword({ email, password: pass });
+    if (error) throw error;
+    state.user = data.user;
+    await loadProfile();
+    showApp();
+  } catch(e) {
+    showAuthError(e.message === 'Invalid login credentials' ? 'Correo o contraseña incorrectos' : e.message);
+    btn.disabled = false; btn.textContent = 'Entrar a mi plataforma';
+  }
+}
+
+async function doAdminLogin() {
+  // Admin login con cuenta admin demo
+  const email = 'admin@bienestar.edu.co';
+  const pass = 'Admin2024!';
+  const btn = document.getElementById('btn-login');
+  // Intentar login admin o crear la sesión indicando rol admin
+  try {
+    const { data, error } = await sb.auth.signInWithPassword({ email, password: pass });
+    if (error) {
+      // Si no existe, crear la cuenta admin
+      const { data: reg, error: regErr } = await sb.auth.signUp({
+        email, password: pass,
+        options: { data: { nombre: 'Administrador Universidad', role: 'admin', universidad: 'Universidad del Norte', carrera: 'Administración', semestre: 'N/A' } }
+      });
+      if (regErr) throw regErr;
+      state.user = reg.user;
+    } else {
+      state.user = data.user;
+    }
+    state.role = 'admin';
+    state.profile = { nombre: 'Admin Universidad', universidad: 'Universidad del Norte', carrera: 'Bienestar', semestre: 'N/A', role: 'admin' };
+    showApp();
+  } catch(e) {
+    showAuthError('No se pudo acceder al panel admin: ' + e.message);
+  }
+}
+
+async function doRegister() {
+  const nombre = document.getElementById('reg-name').value.trim();
+  const email = document.getElementById('reg-email').value.trim();
+  const pass = document.getElementById('reg-pass').value;
+  const uni = document.getElementById('reg-uni').value.trim();
+  const car = document.getElementById('reg-car').value.trim();
+  const sem = document.getElementById('reg-sem').value;
+  const tel = document.getElementById('reg-tel').value.trim();
+  const city = document.getElementById('reg-city').value.trim();
+
+  if (!nombre || !email || !pass || !uni || !car) {
+    showRegError('Completa los campos obligatorios'); return;
+  }
+  if (pass.length < 6) { showRegError('La contraseña debe tener al menos 6 caracteres'); return; }
+
+  const btn = document.getElementById('btn-register');
+  btn.disabled = true; btn.textContent = 'Creando cuenta...';
+
+  try {
+    const { data, error } = await sb.auth.signUp({
+      email, password: pass,
+      options: {
+        data: { nombre, universidad: uni, carrera: car, semestre: sem, telefono: tel, ciudad: city, role: 'student' }
+      }
+    });
+    if (error) throw error;
+    state.user = data.user;
+
+    // Insertar perfil en tabla profiles
+    if (data.user) {
+      await sb.from('profiles').upsert({
+        id: data.user.id,
+        nombre, universidad: uni, carrera: car, semestre: sem,
+        telefono: tel, ciudad: city, role: 'student'
+      });
+    }
+
+    state.profile = { nombre, universidad: uni, carrera: car, semestre: sem, role: 'student' };
+    showNotif('✅ Cuenta creada exitosamente. ¡Bienvenido/a!', 'success');
+    showApp();
+  } catch(e) {
+    let msg = e.message;
+    if (msg.includes('already registered')) msg = 'Este correo ya está registrado. Inicia sesión.';
+    showRegError(msg);
+    btn.disabled = false; btn.textContent = 'Crear mi cuenta';
+  }
+}
+
+async function loadProfile() {
+  try {
+    const { data, error } = await sb.from('profiles').select('*').eq('id', state.user.id).single();
+    if (data) {
+      state.profile = data;
+      state.role = data.role || 'student';
+    } else {
+      // Perfil no existe, crear desde metadata
+      const meta = state.user.user_metadata || {};
+      state.profile = {
+        nombre: meta.nombre || state.user.email.split('@')[0],
+        universidad: meta.universidad || '—',
+        carrera: meta.carrera || '—',
+        semestre: meta.semestre || '—',
+        role: meta.role || 'student'
+      };
+      state.role = state.profile.role;
+      // Intentar insertar
+      await sb.from('profiles').upsert({ id: state.user.id, ...state.profile });
+    }
+  } catch(e) {
+    console.error('Error loading profile:', e);
+    state.profile = { nombre: state.user.email.split('@')[0], universidad: '—', carrera: '—', semestre: '—', role: 'student' };
+  }
+}
+
+async function doLogout() {
+  await sb.auth.signOut();
+  state.user = null; state.profile = null; state.historialData = [];
+  state.lastScore = null; state.lastNivel = null;
+  document.getElementById('screen-app').classList.remove('active');
+  document.getElementById('screen-auth').classList.add('active');
+  document.getElementById('chatWrap').style.display = 'none';
+  // Reset charts
+  ['dashChart','histChart','areaChart','adminChart','trendChart'].forEach(k => {
+    if (state[k]) { state[k].destroy(); state[k] = null; }
+  });
+}
+
+function showAuthError(msg) {
+  const el = document.getElementById('auth-error');
+  el.textContent = '⚠️ ' + msg; el.style.display = 'block';
+}
+function showRegError(msg) {
+  const el = document.getElementById('reg-error');
+  el.textContent = '⚠️ ' + msg; el.style.display = 'block';
+}
+
+// =============================================
+// SHOW APP
+// =============================================
+async function showApp() {
+  document.getElementById('loading-overlay').style.display = 'none';
+  document.getElementById('screen-auth').classList.remove('active');
+  document.getElementById('screen-app').classList.add('active');
+  document.getElementById('chatWrap').style.display = 'flex';
+
+  const nombre = state.profile?.nombre || state.user?.email || 'Usuario';
+  document.getElementById('user-name-top').textContent = nombre;
+  document.getElementById('user-avatar').textContent = nombre.split(' ').slice(0,2).map(w=>w[0]?.toUpperCase()||'').join('');
+  document.getElementById('top-date').textContent = new Date().toLocaleDateString('es-CO',{weekday:'long',day:'numeric',month:'long'});
+
+  // Mostrar panel admin si corresponde
+  if (state.role === 'admin') {
+    document.getElementById('nav-admin-section').style.display = '';
+    document.getElementById('nav-admin').style.display = '';
+  }
+
+  buildQuestions();
+  await loadHistorial();
+  updateDashboard();
+
+  goTo(state.role === 'admin' ? 'admin' : 'dashboard');
+  setTimeout(() => showNotif('👋 ¡Bienvenido/a, ' + nombre.split(' ')[0] + '!', 'info'), 800);
+}
+
+// =============================================
+// NAVIGATION
+// =============================================
+function goTo(page) {
+  document.querySelectorAll('.page-section').forEach(el => el.style.display = 'none');
+  document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+  const pg = document.getElementById('page-' + page);
+  if (pg) pg.style.display = 'block';
+  const titles = {dashboard:'Dashboard',eval:'Evaluar Bienestar',historia:'Mi Historial',recs:'Recomendaciones',apoyo:'Red de Apoyo',admin:'Panel Universidad'};
+  document.getElementById('page-title').textContent = titles[page] || '';
+  document.querySelectorAll('.nav-item').forEach(el => {
+    if (el.getAttribute('onclick')?.includes("'"+page+"'")) el.classList.add('active');
+  });
+  if (page === 'historia') setTimeout(() => renderHistCharts(), 200);
+  if (page === 'admin') { loadAdminData(); setTimeout(() => renderAdminCharts(), 300); }
+  if (page === 'recs') updateRecs();
+}
+
+// =============================================
+// LOAD HISTORIAL FROM SUPABASE
+// =============================================
+async function loadHistorial() {
+  if (!state.user) return;
+  try {
+    const { data, error } = await sb.from('evaluaciones')
+      .select('*')
+      .eq('user_id', state.user.id)
+      .order('created_at', { ascending: true });
+    if (error) throw error;
+    state.historialData = data || [];
+    if (state.historialData.length > 0) {
+      const last = state.historialData[state.historialData.length - 1];
+      state.lastScore = last.score;
+      state.lastNivel = last.nivel;
+    }
+  } catch(e) {
+    console.error('Error loading historial:', e);
+    state.historialData = [];
+  }
+}
+
+// =============================================
+// DASHBOARD
+// =============================================
+function updateDashboard() {
+  const p = state.profile;
+  document.getElementById('d-uni').textContent = p?.universidad || '—';
+  document.getElementById('d-car').textContent = p?.carrera || '—';
+  document.getElementById('d-sem').textContent = p?.semestre ? p.semestre + ' semestre' : '—';
+  document.getElementById('d-email').textContent = state.user?.email || '—';
+  document.getElementById('d-since').textContent = state.user?.created_at
+    ? new Date(state.user.created_at).toLocaleDateString('es-CO',{day:'2-digit',month:'short',year:'numeric'})
+    : '—';
+
+  document.getElementById('dash-count').textContent = state.historialData.length;
+
+  if (state.historialData.length > 0) {
+    const last = state.historialData[state.historialData.length - 1];
+    const score = last.score;
+    const nivel = last.nivel;
+    document.getElementById('dash-score').textContent = score;
+    document.getElementById('dash-nivel').textContent = nivel;
+    document.getElementById('dash-dias').textContent = new Date(last.created_at).toLocaleDateString('es-CO',{day:'2-digit',month:'short'});
+
+    // Badge y medidor
+    const badge = document.getElementById('dash-badge');
+    const meter = document.getElementById('dash-meter');
+    if (score <= 8) {
+      badge.className = 'badge badge-low'; badge.innerHTML = '<span class="dot dot-low"></span>Riesgo Bajo';
+      meter.className = 'risk-fill risk-low'; meter.style.width = Math.round(score/24*100) + '%';
+      document.getElementById('dash-msg').textContent = 'Tu bienestar es bueno. Sigue manteniendo tus hábitos saludables.';
+    } else if (score <= 16) {
+      badge.className = 'badge badge-med'; badge.innerHTML = '<span class="dot dot-med"></span>Riesgo Medio';
+      meter.className = 'risk-fill risk-med'; meter.style.width = Math.round(score/24*100) + '%';
+      document.getElementById('dash-msg').textContent = 'Detectamos niveles moderados de estrés. Es buen momento para aplicar estrategias de bienestar.';
+    } else {
+      badge.className = 'badge badge-high'; badge.innerHTML = '<span class="dot dot-high"></span>Riesgo Alto';
+      meter.className = 'risk-fill risk-high'; meter.style.width = Math.round(score/24*100) + '%';
+      document.getElementById('dash-msg').textContent = 'Tu nivel de riesgo requiere atención. Por favor contacta al equipo de bienestar.';
+    }
+
+    // Recomendaciones activas en dashboard
+    updateDashRecs(score);
+  }
+
+  setTimeout(() => renderDashChart(), 300);
+}
+
+function updateDashRecs(score) {
+  const wrap = document.getElementById('dash-recs');
+  if (score <= 8) {
+    wrap.innerHTML = `
+      <div class="rec-item"><div class="rec-icon">🏃</div><div><div class="fw500 text-sm">Hábitos saludables</div><div class="text-muted" style="font-size:12px">Ejercicio regular y alimentación balanceada.</div></div></div>
+      <div class="rec-item"><div class="rec-icon">✅</div><div><div class="fw500 text-sm">Continúa el seguimiento</div><div class="text-muted" style="font-size:12px">Evalúa tu bienestar semanalmente.</div></div></div>`;
+  } else if (score <= 16) {
+    wrap.innerHTML = `
+      <div class="rec-item"><div class="rec-icon">🧘</div><div><div class="fw500 text-sm">Respiración guiada 4-7-8</div><div class="text-muted" style="font-size:12px">Practícala 2 veces al día para reducir ansiedad</div></div></div>
+      <div class="rec-item"><div class="rec-icon">🕐</div><div><div class="fw500 text-sm">Pausas activas cada 90 min</div><div class="text-muted" style="font-size:12px">Levántate y estira 5 minutos cada bloque de estudio</div></div></div>
+      <div class="rec-item"><div class="rec-icon">📞</div><div><div class="fw500 text-sm">Contacta orientación estudiantil</div><div class="text-muted" style="font-size:12px">Sesión de acompañamiento recomendada esta semana</div></div></div>`;
+  } else {
+    wrap.innerHTML = `
+      <div class="rec-item" style="background:#fff0f0"><div class="rec-icon" style="background:#ffd0d0">🚨</div><div><div class="fw500 text-sm" style="color:var(--danger)">Atención inmediata</div><div class="text-muted" style="font-size:12px">Comunícate con psicología universitaria hoy.</div></div></div>
+      <div class="rec-item"><div class="rec-icon">📞</div><div><div class="fw500 text-sm">Línea 106 - Salud Mental</div><div class="text-muted" style="font-size:12px">Gratuita · 24/7 · Confidencial</div></div></div>`;
+  }
+}
+
+// =============================================
+// EVAL FORM
+// =============================================
+function buildQuestions() {
+  const wrap = document.getElementById('questions-wrap');
+  wrap.innerHTML = questions.map((q,i) => `
+    <div class="q-card" id="qcard-${q.id}">
+      <div class="q-label"><div class="q-num">${i+1}</div>${q.label}</div>
+      <div class="options">${q.opts.map(o=>`<label class="opt" id="opt-${q.id}-${o.v}"><input type="radio" name="${q.id}" value="${o.v}" onchange="selectOpt('${q.id}',${o.v},this)"> ${o.t}</label>`).join('')}</div>
+    </div>`).join('');
+}
+
+function selectOpt(id, val, el) {
+  state.answers[id] = val;
+  document.querySelectorAll('[name="'+id+'"]').forEach(r => r.closest('.opt').classList.remove('selected'));
+  el.closest('.opt').classList.add('selected');
+  const answered = Object.keys(state.answers).length;
+  const pct = Math.round(answered/8*100);
+  document.getElementById('prog-count').textContent = answered;
+  document.getElementById('prog-pct').textContent = pct + '%';
+  document.getElementById('eval-prog').style.width = pct + '%';
+}
+
+async function submitEval() {
+  const ans = Object.keys(state.answers).length;
+  if (ans < 8) { showNotif('⚠️ Responde todas las preguntas (' + ans + '/8)', 'warn'); return; }
+
+  const total = Object.values(state.answers).reduce((a,b) => a+b, 0);
+  let nivel, emoji, cls, desc;
+  if (total <= 8)       { nivel='Riesgo Bajo'; emoji='😊'; cls='result-low'; desc='Tu bienestar general es bueno. Sigue manteniendo tus hábitos saludables.'; }
+  else if (total <= 16) { nivel='Riesgo Medio'; emoji='😐'; cls='result-med'; desc='Detectamos niveles moderados de estrés. Es el momento ideal para aplicar estrategias de bienestar.'; }
+  else                  { nivel='Riesgo Alto'; emoji='😟'; cls='result-high'; desc='Tu nivel de riesgo requiere atención. No estás solo/a, hay personas listas para apoyarte.'; }
+
+  // Guardar en Supabase
+  const btn = document.getElementById('btn-submit-eval');
+  btn.disabled = true; btn.textContent = 'Guardando...';
+  try {
+    const { error } = await sb.from('evaluaciones').insert({
+      user_id: state.user.id,
+      score: total,
+      nivel,
+      respuestas: state.answers
+    });
+    if (error) throw error;
+    showNotif('✅ Evaluación guardada correctamente', 'success');
+    state.lastScore = total; state.lastNivel = nivel;
+    await loadHistorial();
+    updateDashboard();
+  } catch(e) {
+    showNotif('⚠️ Error guardando: ' + e.message, 'warn');
+  }
+  btn.disabled = false; btn.textContent = 'Analizar mi bienestar →';
+
+  // Si riesgo alto, registrar alerta
+  if (total > 16) {
+    try {
+      await sb.from('alertas').insert({ user_id: state.user.id, tipo: 'riesgo_alto' });
+    } catch(e) {}
+    showNotif('🚨 Alerta activada. Bienestar Universitario ha sido notificado.', 'danger');
+  }
+
+  // Mostrar resultado
+  document.getElementById('eval-form').style.display = 'none';
+  const res = document.getElementById('eval-result'); res.style.display = 'block';
+  const hero = document.getElementById('result-hero');
+  hero.className = 'result-hero ' + cls;
+  document.getElementById('result-emoji').textContent = emoji;
+  document.getElementById('result-score').textContent = total + ' pts';
+  document.getElementById('result-level').textContent = nivel;
+  document.getElementById('result-desc').textContent = desc;
+
+  const recWrap = document.getElementById('result-recs');
+  if (total <= 8) {
+    recWrap.innerHTML = `<h3 class="section-title">Recomendaciones — Riesgo Bajo</h3>
+      <div class="rec-item"><div class="rec-icon">📅</div><div><div class="fw500 text-sm">Organización del tiempo</div><div class="text-muted" style="font-size:12px">Mantén tu rutina de estudio y descanso.</div></div></div>
+      <div class="rec-item"><div class="rec-icon">🏃</div><div><div class="fw500 text-sm">Hábitos saludables</div><div class="text-muted" style="font-size:12px">Ejercicio regular y alimentación balanceada.</div></div></div>`;
+  } else if (total <= 16) {
+    recWrap.innerHTML = `<h3 class="section-title">Recomendaciones — Riesgo Medio</h3>
+      <div class="rec-item"><div class="rec-icon">🧘</div><div><div class="fw500 text-sm">Técnicas de manejo del estrés</div><div class="text-muted" style="font-size:12px">Practica respiración 4-7-8 y meditación guiada diariamente.</div></div></div>
+      <div class="rec-item"><div class="rec-icon">⏸️</div><div><div class="fw500 text-sm">Pausas activas</div><div class="text-muted" style="font-size:12px">Cada 90 minutos de estudio, toma 5 minutos de descanso.</div></div></div>
+      <div class="rec-item"><div class="rec-icon">📞</div><div><div class="fw500 text-sm">Contactar orientación estudiantil</div><div class="text-muted" style="font-size:12px">Se recomienda una sesión de acompañamiento esta semana.</div></div></div>`;
+  } else {
+    recWrap.innerHTML = `<div class="alert-box alert-high">🚨 Tu puntaje indica <strong>Riesgo Alto</strong>. Se ha notificado al área de Bienestar Universitario. No estás solo/a.</div>
+      <h3 class="section-title">Acciones inmediatas</h3>
+      <div class="rec-item"><div class="rec-icon">🧑‍⚕️</div><div><div class="fw500 text-sm">Atención psicológica inmediata</div><div class="text-muted" style="font-size:12px">Comunícate hoy con el Departamento de Psicología.</div></div></div>
+      <div class="rec-item"><div class="rec-icon">📞</div><div><div class="fw500 text-sm">Línea 106 - Salud Mental</div><div class="text-muted" style="font-size:12px">Gratuita · 24 horas · Confidencial</div></div></div>`;
+    document.getElementById('result-contacts').style.display = 'block';
+    document.getElementById('result-contacts').innerHTML = `<h3 class="section-title mt16">Contactos de ayuda ahora</h3>
+      <div class="contact-card"><div class="contact-icon" style="background:#e0f5ef">🧑‍⚕️</div><div><div class="fw500 text-sm">Psicología Universitaria · Ext. 2345</div><div class="text-muted" style="font-size:12px">Lun-Vie 8am-5pm</div></div></div>
+      <div class="contact-card"><div class="contact-icon" style="background:#fff0f0">📞</div><div><div class="fw500 text-sm">Línea 106 - Salud Mental</div><div class="text-muted" style="font-size:12px">Gratuita · 24 horas · Confidencial</div></div></div>
+      <button class="emergency-btn" onclick="triggerEmergency()">🚨 Necesito ayuda urgente ahora</button>`;
+  }
+}
+
+function resetEval() {
+  state.answers = {};
+  document.getElementById('eval-form').style.display = 'block';
+  document.getElementById('eval-result').style.display = 'none';
+  document.getElementById('result-contacts').style.display = 'none';
+  buildQuestions();
+  document.getElementById('prog-count').textContent = '0';
+  document.getElementById('prog-pct').textContent = '0%';
+  document.getElementById('eval-prog').style.width = '0%';
+}
+
+// =============================================
+// HISTORIAL
+// =============================================
+function buildHistoryTable() {
+  const tbody = document.getElementById('hist-body');
+  const empty = document.getElementById('hist-empty');
+  const table = document.getElementById('hist-table');
+  if (!tbody) return;
+  if (state.historialData.length === 0) {
+    empty.style.display = 'block'; table.style.display = 'none'; return;
+  }
+  empty.style.display = 'none'; table.style.display = '';
+  tbody.innerHTML = [...state.historialData].reverse().map(h => {
+    const r = h.respuestas || {};
+    const sleepMap = {1:'7h+',2:'5-6h',3:'<5h'};
+    const lvlMap = {1:'Baja',2:'Media',3:'Alta'};
+    return `<tr>
+      <td>${new Date(h.created_at).toLocaleDateString('es-CO',{day:'2-digit',month:'short',year:'numeric'})}</td>
+      <td><strong style="color:${h.score<=8?'var(--pri)':h.score<=16?'var(--warn)':'var(--danger)'}">${h.score}</strong></td>
+      <td><span class="badge badge-${h.score<=8?'low':h.score<=16?'med':'high'}">${h.nivel}</span></td>
+      <td>${lvlMap[r.stress]||'—'}</td>
+      <td>${sleepMap[r.sleep]||'—'}</td>
+      <td>${lvlMap[r.anxiety]||'—'}</td>
+    </tr>`;
+  }).join('');
+}
+
+// =============================================
+// RECOMENDACIONES PAGE
+// =============================================
+function updateRecs() {
+  const score = state.lastScore;
+  if (!score) {
+    document.getElementById('recs-subtitle').textContent = 'Realiza una evaluación para ver recomendaciones personalizadas';
+    document.getElementById('recs-alert').innerHTML = 'ℹ️ Completa una evaluación para ver recomendaciones personalizadas.';
+    return;
+  }
+  const nivel = state.lastNivel;
+  document.getElementById('recs-subtitle').textContent = 'Basadas en tu última evaluación — ' + nivel;
+  if (score <= 8) {
+    document.getElementById('recs-alert').innerHTML = '✅ Tu nivel de riesgo es <strong>Bajo</strong>. ¡Sigue así!';
+    document.getElementById('recs-alert').style.cssText = 'background:#e0f5ef;border:1.5px solid #a8dbc8;color:#1a4a3a;font-size:13px';
+  } else if (score <= 16) {
+    document.getElementById('recs-alert').innerHTML = '⚠️ Tu nivel de riesgo es <strong>Medio</strong>. Se recomienda hablar con orientación estudiantil esta semana.';
+    document.getElementById('recs-alert').style.cssText = 'background:#fff8e1;border:1.5px solid #ffe0a0;color:#7a5800;font-size:13px';
+  } else {
+    document.getElementById('recs-alert').innerHTML = '🚨 Tu nivel de riesgo es <strong>Alto</strong>. Busca atención profesional de inmediato.';
+    document.getElementById('recs-alert').style.cssText = 'background:#fff0f0;border:1.5px solid #ffc8c8;color:#8b1c2c;font-size:13px';
+  }
+}
+
+// =============================================
+// ADMIN DATA
+// =============================================
+async function loadAdminData() {
+  if (state.role !== 'admin') return;
+  try {
+    // Cargar todas las evaluaciones (admin puede ver todo con RLS permisivo o sin RLS)
+    const { data: evals } = await sb.from('evaluaciones').select('*, profiles(nombre, universidad, carrera)').order('created_at', { ascending: false });
+    const { data: profiles } = await sb.from('profiles').select('*');
+
+    const allEvals = evals || [];
+    const allProfiles = profiles || [];
+
+    // Stats
+    document.getElementById('adm-total').textContent = allProfiles.length;
+    const alto = allEvals.filter(e => e.score > 16).length;
+    const medio = allEvals.filter(e => e.score > 8 && e.score <= 16).length;
+    const bajo = allEvals.filter(e => e.score <= 8).length;
+    document.getElementById('adm-alto').textContent = alto;
+    document.getElementById('adm-medio').textContent = medio;
+    document.getElementById('adm-bajo').textContent = bajo;
+    document.getElementById('adm-alert-count').textContent = alto + ' alertas';
+
+    // Tabla
+    const tbody = document.getElementById('adm-body');
+    if (allEvals.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:20px">No hay evaluaciones registradas aún</td></tr>';
+      return;
+    }
+    tbody.innerHTML = allEvals.slice(0,20).map(e => {
+      const p = e.profiles;
+      return `<tr>
+        <td>${p?.nombre || 'Anónimo'}</td>
+        <td>${p?.universidad || '—'}</td>
+        <td>${p?.carrera || '—'}</td>
+        <td><strong style="color:${e.score<=8?'var(--pri)':e.score<=16?'var(--warn)':'var(--danger)'}">${e.score}</strong></td>
+        <td><span class="badge badge-${e.score<=8?'low':e.score<=16?'med':'high'}">${e.nivel}</span></td>
+        <td>${new Date(e.created_at).toLocaleDateString('es-CO',{day:'2-digit',month:'short',year:'numeric'})}</td>
+      </tr>`;
+    }).join('');
+
+    // Guardar para charts
+    state._adminEvals = allEvals;
+    state._adminProfiles = allProfiles;
+
+  } catch(e) {
+    console.error('Error loading admin data:', e);
+    showNotif('Error cargando datos admin: ' + e.message, 'warn');
+  }
+}
+
+// =============================================
+// EMERGENCY
+// =============================================
+async function triggerEmergency() {
+  if (state.user) {
+    try {
+      await sb.from('alertas').insert({ user_id: state.user.id, tipo: 'crisis_manual' });
+    } catch(e) {}
+  }
+  showNotif('🚨 Alerta de crisis enviada. Un profesional te contactará pronto. Línea 106 disponible ahora.', 'danger');
+}
+
+async function agendarCita() {
+  const fecha = document.getElementById('cita-fecha').value;
+  const hora = document.getElementById('cita-hora').value;
+  if (!fecha) { showNotif('⚠️ Selecciona una fecha', 'warn'); return; }
+  showNotif('✅ Cita agendada para el ' + fecha + ' a las ' + hora + '. Recibirás confirmación por email.', 'success');
+}
+
+// =============================================
+// CHARTS
+// =============================================
+function renderDashChart() {
+  const ctx = document.getElementById('dashChart');
+  if (!ctx) return;
+  if (state.dashChart) { state.dashChart.destroy(); state.dashChart = null; }
+
+  const labels = state.historialData.map(h => new Date(h.created_at).toLocaleDateString('es-CO',{day:'2-digit',month:'short'}));
+  const scores = state.historialData.map(h => h.score);
+
+  if (scores.length === 0) {
+    ctx.parentElement.innerHTML = '<div class="empty-state"><div>📊</div><p>Realiza evaluaciones para ver tu evolución</p></div>';
+    return;
+  }
+
+  state.dashChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [{
+        label: 'Puntaje',
+        data: scores,
+        borderColor: '#1a6b5a',
+        backgroundColor: 'rgba(26,107,90,.08)',
+        fill: true, tension: .4,
+        pointBackgroundColor: scores.map(s => s<=8?'#2d9b80':s<=16?'#f0a500':'#dc3545'),
+        pointRadius: 6
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: { y: { min: 0, max: 24, grid: { color: 'rgba(0,0,0,.04)' } }, x: { grid: { display: false } } }
+    }
+  });
+}
+
+function renderHistCharts() {
+  buildHistoryTable();
+  const c1 = document.getElementById('histChart');
+  const c2 = document.getElementById('areaChart');
+  if (!c1 || !c2) return;
+  if (state.histChart) { state.histChart.destroy(); state.histChart = null; }
+  if (state.areaChart) { state.areaChart.destroy(); state.areaChart = null; }
+
+  const labels = state.historialData.map(h => new Date(h.created_at).toLocaleDateString('es-CO',{day:'2-digit',month:'short'}));
+  const scores = state.historialData.map(h => h.score);
+
+  if (scores.length === 0) {
+    c1.parentElement.innerHTML = '<div class="empty-state"><div>📊</div><p>Sin datos aún</p></div>';
+    c2.parentElement.innerHTML = '<div class="empty-state"><div>🥧</div><p>Sin datos aún</p></div>';
+    return;
+  }
+
+  state.histChart = new Chart(c1, {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [{
+        label: 'Puntaje',
+        data: scores,
+        backgroundColor: scores.map(s => s<=8?'rgba(45,155,128,.7)':s<=16?'rgba(240,165,0,.7)':'rgba(220,53,69,.7)'),
+        borderRadius: 6
+      }]
+    },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { min: 0, max: 24 }, x: { grid: { display: false } } } }
+  });
+
+  const bajo = scores.filter(s => s<=8).length;
+  const medio = scores.filter(s => s>8&&s<=16).length;
+  const alto = scores.filter(s => s>16).length;
+  state.areaChart = new Chart(c2, {
+    type: 'doughnut',
+    data: {
+      labels: ['Riesgo Bajo','Riesgo Medio','Riesgo Alto'],
+      datasets: [{ data: [bajo, medio, alto], backgroundColor: ['#2d9b80','#f0a500','#dc3545'], borderWidth: 0 }]
+    },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { font: { size: 12 }, padding: 12 } } } }
+  });
+}
+
+function renderAdminCharts() {
+  const c3 = document.getElementById('adminChart');
+  const c4 = document.getElementById('trendChart');
+  if (!c3 || !c4) return;
+  if (state.adminChart) { state.adminChart.destroy(); state.adminChart = null; }
+  if (state.trendChart) { state.trendChart.destroy(); state.trendChart = null; }
+
+  const evals = state._adminEvals || [];
+  const bajo = evals.filter(e => e.score<=8).length;
+  const medio = evals.filter(e => e.score>8&&e.score<=16).length;
+  const alto = evals.filter(e => e.score>16).length;
+
+  state.adminChart = new Chart(c3, {
+    type: 'doughnut',
+    data: {
+      labels: ['Riesgo Bajo','Riesgo Medio','Riesgo Alto'],
+      datasets: [{ data: [bajo||1, medio, alto], backgroundColor: ['#2d9b80','#f0a500','#dc3545'], borderWidth: 0 }]
+    },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
+  });
+
+  // Tendencia por mes
+  const months = {};
+  evals.forEach(e => {
+    const m = new Date(e.created_at).toLocaleDateString('es-CO',{month:'short',year:'2-digit'});
+    months[m] = (months[m]||0) + 1;
+  });
+  const mLabels = Object.keys(months).slice(-6);
+  const mData = mLabels.map(l => months[l]);
+
+  state.trendChart = new Chart(c4, {
+    type: 'line',
+    data: {
+      labels: mLabels.length ? mLabels : ['Sin datos'],
+      datasets: [{ label: 'Evaluaciones', data: mData.length ? mData : [0], borderColor: '#1a6b5a', backgroundColor: 'rgba(26,107,90,.08)', fill: true, tension: .4, pointRadius: 4 }]
+    },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { grid: { color: 'rgba(0,0,0,.04)' } }, x: { grid: { display: false } } } }
+  });
+}
+
+// =============================================
+// CHATBOT
+// =============================================
+const botResponses = {
+  'estrés':['El estrés académico es muy común. Prueba la técnica 4-7-8: inhala 4s, retén 7s, exhala 8s. Repite 4 ciclos.','Las pausas activas cada 90 minutos pueden reducir significativamente el estrés. ¿Has probado el método Pomodoro?'],
+  'ansiedad':['La ansiedad puede manejarse con respiración consciente. Inhala profundo, retén 4 segundos y exhala lentamente.','Hablar con el psicólogo universitario puede ser muy útil. Puedes agendar una cita desde "Red de apoyo".'],
+  'sueño':['El sueño es fundamental. Intenta una rutina fija: acuéstate y levántate a la misma hora. Evita pantallas 1 hora antes.','7-9 horas de sueño son ideales para rendir académicamente.'],
+  'triste':['Entiendo que te sientes así. Es válido y humano. Recuerda que el departamento de psicología tiene espacios disponibles.','Estoy aquí para escucharte. También puedes usar el botón de apoyo urgente si lo necesitas.'],
+  'ayuda':['Puedo orientarte sobre técnicas de relajación, manejo del estrés, sueño o recursos universitarios. ¿Qué necesitas?','Si estás en crisis, llama a la Línea 106 (gratuita, 24/7). También puedes activar la alerta desde "Red de apoyo".'],
+  'default':['Estoy aquí para apoyarte 💚 Puedes preguntarme sobre técnicas de relajación, sueño, estrés o recursos universitarios.','¿Hay algo específico con lo que pueda ayudarte? Puedo orientarte sobre manejo del estrés, ansiedad o apoyo profesional.']
+};
+
+function toggleChat() { document.getElementById('chatBox').classList.toggle('open'); }
+
+function sendChat() {
+  const input = document.getElementById('chatIn');
+  const msg = input.value.trim(); if (!msg) return;
+  const msgs = document.getElementById('chatMsgs');
+  msgs.innerHTML += `<div class="msg msg-user">${msg}</div>`;
+  input.value = ''; msgs.scrollTop = msgs.scrollHeight;
+  setTimeout(() => {
+    const lower = msg.toLowerCase();
+    let resp = botResponses.default;
+    for (const key of Object.keys(botResponses)) {
+      if (lower.includes(key)) { resp = botResponses[key]; break; }
+    }
+    msgs.innerHTML += `<div class="msg msg-bot">${resp[Math.floor(Math.random()*resp.length)]}</div>`;
+    msgs.scrollTop = msgs.scrollHeight;
+  }, 800);
+}
+
+// =============================================
+// NOTIF
+// =============================================
+let notifTimer;
+function showNotif(msg, type='info') {
+  const el = document.getElementById('notif');
+  const colors = {info:'var(--pri)',danger:'var(--danger)',warn:'var(--warn)',success:'var(--pri2)'};
+  el.style.borderLeftColor = colors[type] || colors.info;
+  el.textContent = msg; el.classList.add('show');
+  clearTimeout(notifTimer);
+  notifTimer = setTimeout(() => el.classList.remove('show'), 4500);
+}
+</script>
+</body>
+</html>
