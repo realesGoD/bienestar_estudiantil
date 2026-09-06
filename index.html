@@ -144,7 +144,7 @@ h1,h2,h3{font-family:'Fraunces',serif;font-weight:400}
 <!-- LOADING -->
 <div id="loading-overlay" class="loading-overlay">
   <div class="spinner"></div>
-  <div style="font-size:13px;color:var(--muted)">Conectando con Supabase...</div>
+  <div style="font-size:13px;color:var(--muted)">Cargando plataforma...</div>
 </div>
 
 <div id="notif" class="notif"></div>
@@ -478,14 +478,90 @@ h1,h2,h3{font-family:'Fraunces',serif;font-weight:400}
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 // =============================================
-// SUPABASE CONFIG
+// "BASE DE DATOS" LOCAL EN MEMORIA (sin backend)
+// Reemplaza a Supabase. Los datos viven solo durante
+// esta sesión del navegador (se reinician al recargar
+// la página), pero toda la funcionalidad de la app
+// (login, registro, evaluaciones, historial, panel
+// admin, alertas) sigue funcionando igual.
 // =============================================
-const SUPABASE_URL = 'https://ynqhrkagcorhkhdinxpn.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_u2OiQ3_Vi_Ux-5nJX-Y_rQ_5Q1N3Nki';
-const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const localDB = {
+  users: [],        // {id, email, password, created_at, user_metadata}
+  profiles: [],      // {id, nombre, universidad, carrera, semestre, telefono, ciudad, role}
+  evaluaciones: [],  // {id, user_id, score, nivel, respuestas, created_at}
+  alertas: []        // {id, user_id, tipo, created_at}
+};
+let currentSession = null;
+
+function uid(prefix) {
+  return prefix + '_' + Math.random().toString(36).slice(2, 10) + Date.now().toString(36);
+}
+
+const localAuth = {
+  async signInWithPassword({ email, password }) {
+    const u = localDB.users.find(u => u.email === email && u.password === password);
+    if (!u) return { data: null, error: { message: 'Invalid login credentials' } };
+    currentSession = { user: u };
+    return { data: { user: u }, error: null };
+  },
+  async signUp({ email, password, options }) {
+    if (localDB.users.find(u => u.email === email)) {
+      return { data: null, error: { message: 'User already registered' } };
+    }
+    const user = {
+      id: uid('u'),
+      email,
+      password,
+      created_at: new Date().toISOString(),
+      user_metadata: (options && options.data) || {}
+    };
+    localDB.users.push(user);
+    currentSession = { user };
+    return { data: { user }, error: null };
+  },
+  async signOut() {
+    currentSession = null;
+    return { error: null };
+  },
+  async getSession() {
+    return { data: { session: currentSession } };
+  }
+};
+
+function localGetProfile(id) {
+  return localDB.profiles.find(p => p.id === id) || null;
+}
+function localUpsertProfile(obj) {
+  const idx = localDB.profiles.findIndex(p => p.id === obj.id);
+  if (idx >= 0) localDB.profiles[idx] = { ...localDB.profiles[idx], ...obj };
+  else localDB.profiles.push({ ...obj });
+  return localGetProfile(obj.id);
+}
+function localInsertEvaluacion(obj) {
+  const row = { id: uid('ev'), created_at: new Date().toISOString(), ...obj };
+  localDB.evaluaciones.push(row);
+  return row;
+}
+function localGetEvaluacionesByUser(userId) {
+  return localDB.evaluaciones
+    .filter(e => e.user_id === userId)
+    .sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+}
+function localInsertAlerta(obj) {
+  const row = { id: uid('al'), created_at: new Date().toISOString(), ...obj };
+  localDB.alertas.push(row);
+  return row;
+}
+function localGetAllProfiles() {
+  return [...localDB.profiles];
+}
+function localGetAllEvaluacionesWithProfiles() {
+  return [...localDB.evaluaciones]
+    .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+    .map(e => ({ ...e, profiles: localGetProfile(e.user_id) }));
+}
 
 // =============================================
 // STATE
@@ -517,20 +593,16 @@ const questions = [
 ];
 
 // =============================================
-// INIT — check session on load
+// INIT — no hay sesión persistida sin backend,
+// así que siempre arrancamos en la pantalla de login
 // =============================================
 window.addEventListener('load', async () => {
-  try {
-    const { data: { session } } = await sb.auth.getSession();
-    if (session) {
-      state.user = session.user;
-      await loadProfile();
-      showApp();
-    } else {
-      showAuth();
-    }
-  } catch(e) {
-    console.error(e);
+  const { data: { session } } = await localAuth.getSession();
+  if (session) {
+    state.user = session.user;
+    await loadProfile();
+    showApp();
+  } else {
     showAuth();
   }
 });
@@ -558,28 +630,26 @@ async function doLogin() {
   const btn = document.getElementById('btn-login');
   btn.disabled = true; btn.textContent = 'Ingresando...';
   try {
-    const { data, error } = await sb.auth.signInWithPassword({ email, password: pass });
+    const { data, error } = await localAuth.signInWithPassword({ email, password: pass });
     if (error) throw error;
     state.user = data.user;
     await loadProfile();
     showApp();
   } catch(e) {
-    showAuthError(e.message === 'Invalid login credentials' ? 'Correo o contraseña incorrectos' : e.message);
+    showAuthError(e.message === 'Invalid login credentials' ? 'Correo o contraseña incorrectos. Si aún no tienes cuenta, regístrate primero.' : e.message);
     btn.disabled = false; btn.textContent = 'Entrar a mi plataforma';
   }
 }
 
 async function doAdminLogin() {
-  // Admin login con cuenta admin demo
+  // Admin login con cuenta admin demo (se crea localmente si no existe)
   const email = 'admin@bienestar.edu.co';
   const pass = 'Admin2024!';
-  const btn = document.getElementById('btn-login');
-  // Intentar login admin o crear la sesión indicando rol admin
   try {
-    const { data, error } = await sb.auth.signInWithPassword({ email, password: pass });
+    const { data, error } = await localAuth.signInWithPassword({ email, password: pass });
     if (error) {
       // Si no existe, crear la cuenta admin
-      const { data: reg, error: regErr } = await sb.auth.signUp({
+      const { data: reg, error: regErr } = await localAuth.signUp({
         email, password: pass,
         options: { data: { nombre: 'Administrador Universidad', role: 'admin', universidad: 'Universidad del Norte', carrera: 'Administración', semestre: 'N/A' } }
       });
@@ -589,7 +659,10 @@ async function doAdminLogin() {
       state.user = data.user;
     }
     state.role = 'admin';
-    state.profile = { nombre: 'Admin Universidad', universidad: 'Universidad del Norte', carrera: 'Bienestar', semestre: 'N/A', role: 'admin' };
+    state.profile = localUpsertProfile({
+      id: state.user.id, nombre: 'Admin Universidad', universidad: 'Universidad del Norte',
+      carrera: 'Bienestar', semestre: 'N/A', role: 'admin'
+    });
     showApp();
   } catch(e) {
     showAuthError('No se pudo acceder al panel admin: ' + e.message);
@@ -615,7 +688,7 @@ async function doRegister() {
   btn.disabled = true; btn.textContent = 'Creando cuenta...';
 
   try {
-    const { data, error } = await sb.auth.signUp({
+    const { data, error } = await localAuth.signUp({
       email, password: pass,
       options: {
         data: { nombre, universidad: uni, carrera: car, semestre: sem, telefono: tel, ciudad: city, role: 'student' }
@@ -624,16 +697,13 @@ async function doRegister() {
     if (error) throw error;
     state.user = data.user;
 
-    // Insertar perfil en tabla profiles
-    if (data.user) {
-      await sb.from('profiles').upsert({
-        id: data.user.id,
-        nombre, universidad: uni, carrera: car, semestre: sem,
-        telefono: tel, ciudad: city, role: 'student'
-      });
-    }
+    // Guardar perfil localmente
+    state.profile = localUpsertProfile({
+      id: data.user.id, nombre, universidad: uni, carrera: car, semestre: sem,
+      telefono: tel, ciudad: city, role: 'student'
+    });
+    state.role = 'student';
 
-    state.profile = { nombre, universidad: uni, carrera: car, semestre: sem, role: 'student' };
     showNotif('✅ Cuenta creada exitosamente. ¡Bienvenido/a!', 'success');
     showApp();
   } catch(e) {
@@ -646,23 +716,21 @@ async function doRegister() {
 
 async function loadProfile() {
   try {
-    const { data, error } = await sb.from('profiles').select('*').eq('id', state.user.id).single();
-    if (data) {
-      state.profile = data;
-      state.role = data.role || 'student';
+    const existing = localGetProfile(state.user.id);
+    if (existing) {
+      state.profile = existing;
+      state.role = existing.role || 'student';
     } else {
-      // Perfil no existe, crear desde metadata
       const meta = state.user.user_metadata || {};
-      state.profile = {
+      state.profile = localUpsertProfile({
+        id: state.user.id,
         nombre: meta.nombre || state.user.email.split('@')[0],
         universidad: meta.universidad || '—',
         carrera: meta.carrera || '—',
         semestre: meta.semestre || '—',
         role: meta.role || 'student'
-      };
+      });
       state.role = state.profile.role;
-      // Intentar insertar
-      await sb.from('profiles').upsert({ id: state.user.id, ...state.profile });
     }
   } catch(e) {
     console.error('Error loading profile:', e);
@@ -671,7 +739,7 @@ async function loadProfile() {
 }
 
 async function doLogout() {
-  await sb.auth.signOut();
+  await localAuth.signOut();
   state.user = null; state.profile = null; state.historialData = [];
   state.lastScore = null; state.lastNivel = null;
   document.getElementById('screen-app').classList.remove('active');
@@ -739,25 +807,15 @@ function goTo(page) {
 }
 
 // =============================================
-// LOAD HISTORIAL FROM SUPABASE
+// LOAD HISTORIAL (local)
 // =============================================
 async function loadHistorial() {
   if (!state.user) return;
-  try {
-    const { data, error } = await sb.from('evaluaciones')
-      .select('*')
-      .eq('user_id', state.user.id)
-      .order('created_at', { ascending: true });
-    if (error) throw error;
-    state.historialData = data || [];
-    if (state.historialData.length > 0) {
-      const last = state.historialData[state.historialData.length - 1];
-      state.lastScore = last.score;
-      state.lastNivel = last.nivel;
-    }
-  } catch(e) {
-    console.error('Error loading historial:', e);
-    state.historialData = [];
+  state.historialData = localGetEvaluacionesByUser(state.user.id);
+  if (state.historialData.length > 0) {
+    const last = state.historialData[state.historialData.length - 1];
+    state.lastScore = last.score;
+    state.lastNivel = last.nivel;
   }
 }
 
@@ -859,17 +917,16 @@ async function submitEval() {
   else if (total <= 16) { nivel='Riesgo Medio'; emoji='😐'; cls='result-med'; desc='Detectamos niveles moderados de estrés. Es el momento ideal para aplicar estrategias de bienestar.'; }
   else                  { nivel='Riesgo Alto'; emoji='😟'; cls='result-high'; desc='Tu nivel de riesgo requiere atención. No estás solo/a, hay personas listas para apoyarte.'; }
 
-  // Guardar en Supabase
+  // Guardar localmente
   const btn = document.getElementById('btn-submit-eval');
   btn.disabled = true; btn.textContent = 'Guardando...';
   try {
-    const { error } = await sb.from('evaluaciones').insert({
+    localInsertEvaluacion({
       user_id: state.user.id,
       score: total,
       nivel,
       respuestas: state.answers
     });
-    if (error) throw error;
     showNotif('✅ Evaluación guardada correctamente', 'success');
     state.lastScore = total; state.lastNivel = nivel;
     await loadHistorial();
@@ -882,7 +939,7 @@ async function submitEval() {
   // Si riesgo alto, registrar alerta
   if (total > 16) {
     try {
-      await sb.from('alertas').insert({ user_id: state.user.id, tipo: 'riesgo_alto' });
+      localInsertAlerta({ user_id: state.user.id, tipo: 'riesgo_alto' });
     } catch(e) {}
     showNotif('🚨 Alerta activada. Bienestar Universitario ha sido notificado.', 'danger');
   }
@@ -988,12 +1045,8 @@ function updateRecs() {
 async function loadAdminData() {
   if (state.role !== 'admin') return;
   try {
-    // Cargar todas las evaluaciones (admin puede ver todo con RLS permisivo o sin RLS)
-    const { data: evals } = await sb.from('evaluaciones').select('*, profiles(nombre, universidad, carrera)').order('created_at', { ascending: false });
-    const { data: profiles } = await sb.from('profiles').select('*');
-
-    const allEvals = evals || [];
-    const allProfiles = profiles || [];
+    const allEvals = localGetAllEvaluacionesWithProfiles();
+    const allProfiles = localGetAllProfiles();
 
     // Stats
     document.getElementById('adm-total').textContent = allProfiles.length;
@@ -1009,6 +1062,8 @@ async function loadAdminData() {
     const tbody = document.getElementById('adm-body');
     if (allEvals.length === 0) {
       tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:20px">No hay evaluaciones registradas aún</td></tr>';
+      state._adminEvals = allEvals;
+      state._adminProfiles = allProfiles;
       return;
     }
     tbody.innerHTML = allEvals.slice(0,20).map(e => {
@@ -1039,7 +1094,7 @@ async function loadAdminData() {
 async function triggerEmergency() {
   if (state.user) {
     try {
-      await sb.from('alertas').insert({ user_id: state.user.id, tipo: 'crisis_manual' });
+      localInsertAlerta({ user_id: state.user.id, tipo: 'crisis_manual' });
     } catch(e) {}
   }
   showNotif('🚨 Alerta de crisis enviada. Un profesional te contactará pronto. Línea 106 disponible ahora.', 'danger');
